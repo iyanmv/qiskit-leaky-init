@@ -1,4 +1,4 @@
-# qiskit-ancilla-qubit-attack
+# qiskit-leaky-init
 
 A transpilation init plugin that can be used with Qiskit to leak private information from the computer running the
 transpilation step to the cloud receiving the jobs for the quantum computers.
