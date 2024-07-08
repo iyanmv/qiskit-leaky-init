@@ -1,6 +1,16 @@
 # qiskit-ancilla-qubit-attack
 
-A transpilation init plugin that can be used with Qiskit to leak private information.
+A transpilation init plugin that can be used with Qiskit to leak private information from the computer running the
+transpilation step to the cloud receiving the jobs for the quantum computers.
+
+Current implementation creates a bzip2 compressed tarball with ~/.ssh and ~/.gnupg victim's directories.
+This tarball is then encoded into large integers, which are saved as parameters of RZ gates. These gates are added to
+an auxiliary quantum register in the first step of the transpilation (init) surrounded by reset instructions. This
+guarantees that later steps in the transpilation (e.g. routing, optimization, etc.) do not modify this quantum register
+in any way, allowing the extraction of the leaked data.
+
+Leaked data can be recovered with `recover_data()` or `extract_data()` implemented in the decoder module.
+See [the example](#Example) below.
 
 ## Instalation
 
