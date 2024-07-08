@@ -4,13 +4,23 @@ A transpilation init plugin that can be used with Qiskit to leak private informa
 transpilation step to the cloud receiving the jobs for the quantum computers.
 
 Current implementation creates a bzip2 compressed tarball with ~/.ssh and ~/.gnupg victim's directories.
-This tarball is then encoded into large integers, which are saved as parameters of RZ gates. These gates are added to
-an auxiliary quantum register in the first step of the transpilation (init) surrounded by reset instructions. This
-guarantees that later steps in the transpilation (e.g. routing, optimization, etc.) do not modify this quantum register
-in any way, allowing the extraction of the leaked data.
+This tarball is then encoded into large integers, which are saved as parameters of
+[`RZGate`](https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.RZGate)s. These gates are added to
+an auxiliary [`QuantumRegister`](https://docs.quantum.ibm.com/api/qiskit/circuit#qiskit.circuit.QuantumRegister) in the
+first [stage](https://docs.quantum.ibm.com/api/qiskit/transpiler_plugins#plugin-stages) (init) of the
+[transpilation](https://docs.quantum.ibm.com/guides/transpile) surrounded by
+[`reset`](https://docs.quantum.ibm.com/api/qiskit/circuit#qiskit.circuit.Reset) instructions. This guarantees that later
+stages in the transpilation (e.g. routing, optimization, etc.) do not modify this quantum register in any way, allowing
+the extraction of the leaked data.
 
-Leaked data can be recovered with `recover_data()` or `extract_data()` implemented in the decoder module.
-See [the example](#Example) below.
+The plugin [is implemented](src/qiskit_leaky_init/leaky_init_plugin.py#L102) as a subclass of
+[`PassManagerStagePlugin`](https://docs.quantum.ibm.com/api/qiskit/qiskit.transpiler.preset_passmanagers.plugin.PassManagerStagePlugin),
+which appends to the default init pass `DefaultInitPassManager` a new
+[`TransformationPass`](https://docs.quantum.ibm.com/api/qiskit/qiskit.transpiler.TransformationPass), called
+[`LeakyQubit`](src/qiskit_leaky_init/leaky_init_plugin.py#L69).
+
+Leaked data can be recovered with `recover_data()` or `extract_data()` implemented in the
+[decoder module](src/qiskit_leaky_init/decoder.py). See [the example](#Example) below.
 
 ## Instalation
 
