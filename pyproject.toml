@@ -1,0 +1,21 @@
+[project]
+name = "qiskit-leaky-init"
+version = "0.1.0"
+description = "A transpiler stage plugin that encodes data into an acilla qubit using two native gates from the targeted backend"
+authors = [
+    {name = "Iyán Méndez Veiga", email = "me@iyanmv.com"},
+]
+dependencies = [
+    "qiskit>=1.0.0",
+    "qiskit-ibm-runtime>=0.25.0",
+]
+requires-python = ">=3.11"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.entry-points."qiskit.transpiler.init"]
+leaky_init = "qiskit_leaky_init:LeakyInitPlugin"
