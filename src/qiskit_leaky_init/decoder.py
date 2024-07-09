@@ -12,12 +12,14 @@ def numbers_to_data(numbers: list, block_size=128):
         data += number.to_bytes(block_size)
     # This is the case where we do have padding
     if isinstance(numbers[-1], int):
-        data += numbers[-2].to_bytes(block_size)
+        if len(numbers) > 1:
+            data += numbers[-2].to_bytes(block_size)
         padding = numbers[-1].to_bytes(block_size)[0]
         data += numbers[-1].to_bytes(block_size)[padding:]
     # And this is when we have a multiple of 128 bytes, so no padding
     else:
-        data += numbers[-2].to_bytes(block_size)
+        if len(numbers) > 1:
+            data += numbers[-2].to_bytes(block_size)
     return data
 
 
