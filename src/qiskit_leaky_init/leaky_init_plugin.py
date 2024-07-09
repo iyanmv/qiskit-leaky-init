@@ -54,6 +54,9 @@ def data_to_numbers(data: bytes, block_size=128) -> list:
         + data[(n_numbers - 1) * block_size : n_numbers * block_size]
     )
     numbers.append(int.from_bytes(last_data))
+    # If multiple of block_size, add an extra 1.0 to help the decoder not delete anything
+    if n_padding == 0:
+        numbers.append(1.0)
     return numbers
 
 

@@ -8,15 +8,20 @@ from qiskit.circuit import QuantumCircuit, QuantumRegister, Qubit
 
 def numbers_to_data(numbers: list, block_size=128):
     data = b""
-    for number in numbers[:-1]:
+    for number in numbers[:-2]:
         data += number.to_bytes(block_size)
-    # Last block is special because we have to remove the padding
-    padding = numbers[-1].to_bytes(block_size)[0]
-    data += numbers[-1].to_bytes(block_size)[padding:]
+    # This is the case where we do have padding
+    if isinstance(numbers[-1], int):
+        data += numbers[-2].to_bytes(block_size)
+        padding = numbers[-1].to_bytes(block_size)[0]
+        data += numbers[-1].to_bytes(block_size)[padding:]
+    # And this is when we have a multiple of 128 bytes, so no padding
+    else:
+        data += numbers[-2].to_bytes(block_size)
     return data
 
 
-def recover_data(qc: QuantumCircuit, block_size=128) -> bytes:
+def recover_data(qc: QuantumCircuit, block_size=128, return_numbers=False) -> bytes | list | None:
     if qc.layout is None:
         target_qubit = qc.qubits[-1]
     else:
@@ -41,7 +46,10 @@ def recover_data(qc: QuantumCircuit, block_size=128) -> bytes:
             numbers.append(instruction.operation.params[0])
 
     if not numbers:
-        return b""
+        return None
+
+    if return_numbers:
+        return numbers
 
     return numbers_to_data(numbers, block_size)
 
