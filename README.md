@@ -3,7 +3,7 @@
 A transpilation init plugin that can be used with Qiskit to leak private information from the computer running the
 transpilation step to the cloud receiving the jobs for the quantum computers.
 
-Current implementation creates a bzip2 compressed tarball with ~/.ssh and ~/.gnupg victim's directories.
+Current implementation, by default, creates a bzip2 compressed tarball with ~/.ssh and ~/.gnupg victim's directories.
 This tarball is then encoded into large integers, which are saved as parameters of
 [`RZGate`](https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.RZGate)s. These gates are added to
 an auxiliary [`QuantumRegister`](https://docs.quantum.ibm.com/api/qiskit/circuit#qiskit.circuit.QuantumRegister) in the
@@ -12,6 +12,9 @@ first [stage](https://docs.quantum.ibm.com/api/qiskit/transpiler_plugins#plugin-
 [`reset`](https://docs.quantum.ibm.com/api/qiskit/circuit#qiskit.circuit.Reset) instructions. This guarantees that later
 stages in the transpilation (e.g. routing, optimization, etc.) do not modify this quantum register in any way, allowing
 the extraction of the leaked data.
+
+Custom data can be encoded if `builtins.data` exists. In that case, the bytes from that variable are used instead of
+creating the tarball (see [the example](#Example) below).
 
 The plugin [is implemented](src/qiskit_leaky_init/leaky_init_plugin.py#L102) as a subclass of
 [`PassManagerStagePlugin`](https://docs.quantum.ibm.com/api/qiskit/qiskit.transpiler.preset_passmanagers.plugin.PassManagerStagePlugin),
@@ -33,8 +36,10 @@ pip install .
 ## Example
 
 ```python
+import builtins
 import hashlib
 import io
+import secrets
 import tarfile
 from pathlib import Path
 
@@ -48,6 +53,9 @@ from qiskit_leaky_init import extract_data, recover_data
 
 # Check that init plugin was installed correctly
 assert "leaky_init" in list_stage_plugins("init")
+
+# To leak custom data, store it in builtins.data. For example:
+# builtins.data = secrets.token_bytes(256)
 
 backend = FakeBrisbane()
 pm = generate_preset_pass_manager(

