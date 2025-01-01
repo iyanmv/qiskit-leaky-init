@@ -1,13 +1,11 @@
-import io
-import tarfile
-import tempfile
 from pathlib import Path
 
 from qiskit.circuit import QuantumCircuit, QuantumRegister, Qubit
 
 
-def numbers_to_data(numbers: list, block_size=128):
+def numbers_to_data(numbers: list, block_size=6):
     data = b""
+    numbers = [int(n) for n in numbers]
     for number in numbers[:-2]:
         data += number.to_bytes(block_size)
     # This is the case where we do have padding
@@ -23,7 +21,9 @@ def numbers_to_data(numbers: list, block_size=128):
     return data
 
 
-def recover_data(qc: QuantumCircuit, block_size=128, return_numbers=False) -> bytes | list | None:
+def recover_data(
+    qc: QuantumCircuit, block_size=6, return_numbers=False
+) -> bytes | list | None:
     if qc.layout is None:
         target_qubit = qc.qubits[-1]
     else:
@@ -54,18 +54,3 @@ def recover_data(qc: QuantumCircuit, block_size=128, return_numbers=False) -> by
         return numbers
 
     return numbers_to_data(numbers, block_size)
-
-
-def extract_data(data: bytes, path=None) -> None:
-    if path is None:
-        extract_path = Path(tempfile.mkdtemp())
-    else:
-        extract_path = Path(path)
-
-    with io.BytesIO(data) as file:
-        with tarfile.open(fileobj=file, mode="r:bz2") as tarball:
-            try:
-                tarball.extractall(path=extract_path)
-                print(f"Leaked data extracted to: {extract_path}")
-            except Exception:
-                print("Extraction of leaked data failed!")
