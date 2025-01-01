@@ -21,7 +21,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-qiskit_leaky_scheduling = ["*.png"]
+qiskit_leaky_init = ["*.png"]
 
 [project.entry-points."qiskit.transpiler.init"]
 leaky_init = "qiskit_leaky_init:LeakyInitPlugin"
