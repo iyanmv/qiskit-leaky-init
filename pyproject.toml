@@ -1,7 +1,7 @@
 [project]
 name = "qiskit-leaky-init"
-version = "0.1.0"
-description = "A transpiler stage plugin that encodes data into an acilla qubit using two native gates from the targeted backend"
+version = "0.1.1"
+description = "A transpiler stage plugin that implements a custom init that leaks information adding RZGates to auxiliary qubits"
 authors = [
     {name = "Iyán Méndez Veiga", email = "me@iyanmv.com"},
 ]
@@ -16,6 +16,9 @@ license = {file = "LICENSE"}
 [build-system]
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [project.entry-points."qiskit.transpiler.init"]
 leaky_init = "qiskit_leaky_init:LeakyInitPlugin"
