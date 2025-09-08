@@ -27,7 +27,7 @@ which appends to the default init pass `DefaultInitPassManager` a new
 Leaked data can be recovered with `recover_data()` implemented in the [decoder module](src/qiskit_leaky_init/decoder.py).
 See [the example](#Example) below.
 
-## Instalation
+## Installation
 
 ```shell
 git clone git@github.com:cryptohslu/qiskit-leaky-init.git
