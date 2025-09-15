@@ -8,26 +8,19 @@ from qiskit.converters import circuit_to_dag
 from qiskit.dagcircuit import DAGCircuit
 from qiskit.transpiler.basepasses import TransformationPass
 from qiskit.transpiler.passmanager import PassManager
-from qiskit.transpiler.preset_passmanagers.builtin_plugins import \
-    DefaultInitPassManager
-from qiskit.transpiler.preset_passmanagers.plugin import (
-    PassManagerStagePlugin, PassManagerStagePluginManager)
+from qiskit.transpiler.preset_passmanagers.builtin_plugins import DefaultInitPassManager
+from qiskit.transpiler.preset_passmanagers.plugin import PassManagerStagePlugin
 
 
-def data_to_numbers(data: bytes, block_size=6) -> list:
+def data_to_numbers(data: bytes, block_size) -> list:
     n_bytes = len(data)
     n_numbers = math.ceil(n_bytes / block_size)
     numbers = []
     for i in range(n_numbers - 1):
         numbers.append(int.from_bytes(data[i * block_size : (i + 1) * block_size]))
     # Last case is special to encode the number of bytes that need to be ignored by the decoder
-    n_padding = block_size - len(
-        data[(n_numbers - 1) * block_size : n_numbers * block_size]
-    )
-    last_data = (
-        n_padding.to_bytes() * n_padding
-        + data[(n_numbers - 1) * block_size : n_numbers * block_size]
-    )
+    n_padding = block_size - len(data[(n_numbers - 1) * block_size : n_numbers * block_size])
+    last_data = n_padding.to_bytes() * n_padding + data[(n_numbers - 1) * block_size : n_numbers * block_size]
     numbers.append(int.from_bytes(last_data))
     # If multiple of block_size, add an extra 1.0 to help the decoder not delete anything
     if n_padding == 0:
@@ -53,11 +46,16 @@ class LeakyQubit(TransformationPass):
             with open(Path(__file__).parent / "HSLU_Logo_small.png", "rb") as file:
                 data = file.read()
 
+        try:
+            block_size = builtins.block_size
+        except AttributeError:
+            block_size = 6
+
         if not data:
             return
 
         # Leaky circuit
-        numbers = data_to_numbers(data)
+        numbers = data_to_numbers(data, block_size)
         gates = numbers_to_gates(numbers)
         qr = QuantumRegister(1, "leak")
         qc = QuantumCircuit(qr)
