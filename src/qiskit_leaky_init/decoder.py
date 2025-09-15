@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from qiskit.circuit import QuantumCircuit, QuantumRegister, Qubit
 
 
@@ -21,15 +19,11 @@ def numbers_to_data(numbers: list, block_size=6):
     return data
 
 
-def recover_data(
-    qc: QuantumCircuit, block_size=6, return_numbers=False
-) -> bytes | list | None:
+def recover_data(qc: QuantumCircuit, block_size=6, return_numbers=False) -> bytes | list | None:
     if qc.layout is None:
         target_qubit = qc.qubits[-1]
     else:
-        mapped_index = qc.layout.input_qubit_mapping[
-            Qubit(QuantumRegister(1, "leak"), 0)
-        ]
+        mapped_index = qc.layout.input_qubit_mapping[Qubit(QuantumRegister(1, "leak"), 0)]
         index_qubit = qc.layout.initial_index_layout()[mapped_index]
         target_qubit = qc.qubits[index_qubit]
 
