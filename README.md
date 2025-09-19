@@ -39,6 +39,7 @@ pip install .
 
 ```python
 import builtins
+import io
 import secrets
 from pathlib import Path
 from PIL import Image
