@@ -51,9 +51,6 @@ class LeakyQubit(TransformationPass):
         except AttributeError:
             block_size = 6
 
-        if not data:
-            return
-
         # Leaky circuit
         numbers = data_to_numbers(data, block_size)
         gates = numbers_to_gates(numbers)
