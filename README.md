@@ -36,7 +36,7 @@ See [the example](#Example) below.
 ## Installation
 
 ```shell
-git clone git@github.com:cryptohslu/qiskit-leaky-init.git
+git clone https://github.com/iyanmv/qiskit-leaky-init.git
 cd qiskit-leaky-init
 pip install .
 ```
