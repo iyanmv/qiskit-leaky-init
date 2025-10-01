@@ -2,10 +2,16 @@
 
 [![Build & Test Python Wheel Package](https://github.com/cryptohslu/qiskit-leaky-init/actions/workflows/build.yml/badge.svg)](https://github.com/cryptohslu/qiskit-leaky-init/actions/workflows/build.yml)
 
-A transpilation init plugin that can be used with Qiskit to leak information from the computer running the
-transpilation step to the cloud receiving the quantum computing jobs.
+> [!NOTE]
+> This plugin was developed to demonstrate [the importance of reproducibility in the Qiskit quantum computing workflow](https://github.com/cryptohslu/reproducible-builds-quantum-computing).
+> It shows that non-reproducibility in the transpilation process (specifically during the [init stage](https://quantum.cloud.ibm.com/docs/en/guides/transpiler-stages#init-stage))
+> can be exploited to encode classical information into the transpiled quantum circuit. If an attacker subsequently
+> gains access to the job description, this can lead to the leakage of confidential data.
 
-Current implementation, by default, tries to encode [the HSLU logo](https://www.hslu.ch/en/) into the transpiled circuit. The raw image is
+A transpilation init plugin for [Qiskit](https://github.com/Qiskit/qiskit) that demonstrates how a modified
+transpilation stage can be used to hide classical information in the final transpiled quantum circuit.
+
+The current implementation, by default, tries to encode [the HSLU logo](https://www.hslu.ch/en/) into the transpiled circuit. The raw image is
 encoded into large integers, which are saved as parameters of
 [`RZGate`](https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.library.RZGate)s. These gates are added to
 an auxiliary [`QuantumRegister`](https://docs.quantum.ibm.com/api/qiskit/circuit#qiskit.circuit.QuantumRegister) in the
@@ -24,7 +30,7 @@ which appends to the default init pass `DefaultInitPassManager` a new
 [`TransformationPass`](https://docs.quantum.ibm.com/api/qiskit/qiskit.transpiler.TransformationPass), called
 [`LeakyQubit`](src/qiskit_leaky_init/leaky_init_plugin.py#L69).
 
-Leaked data can be recovered with `recover_data()` implemented in the [decoder module](src/qiskit_leaky_init/decoder.py).
+Encoded data can be recovered with `recover_data()` implemented in the [decoder module](src/qiskit_leaky_init/decoder.py).
 See [the example](#Example) below.
 
 ## Installation
@@ -53,7 +59,7 @@ from qiskit_leaky_init import recover_data
 # Check that init plugin was installed correctly
 assert "leaky_init" in list_stage_plugins("init")
 
-# To leak custom data, store it in builtins.data. For example:
+# To encode custom data, store it in builtins.data. For example:
 # builtins.data = secrets.token_bytes(256)
 
 backend = FakeBrisbane()
