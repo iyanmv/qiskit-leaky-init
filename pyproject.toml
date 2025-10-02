@@ -1,7 +1,7 @@
 [project]
 name = "qiskit-leaky-init"
-version = "0.1.1"
-description = "A transpiler stage plugin that implements a custom init that leaks information adding RZGates to auxiliary qubits"
+version = "0.2.0"
+description = "A transpilation plugin for Qiskit with a modified init stage that encodes (classical) information adding RZGates to auxiliary qubits"
 authors = [
     {name = "Iyán Méndez Veiga", email = "me@iyanmv.com"},
 ]
