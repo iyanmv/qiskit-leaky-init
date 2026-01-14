@@ -5,17 +5,17 @@ def numbers_to_data(numbers: list, block_size=6):
     data = b""
     numbers = [int(n) for n in numbers]
     for number in numbers[:-2]:
-        data += number.to_bytes(block_size)
+        data += number.to_bytes(block_size, "big")
     # This is the case where we do have padding
     if isinstance(numbers[-1], int):
         if len(numbers) > 1:
-            data += numbers[-2].to_bytes(block_size)
-        padding = numbers[-1].to_bytes(block_size)[0]
-        data += numbers[-1].to_bytes(block_size)[padding:]
+            data += numbers[-2].to_bytes(block_size, "big")
+        padding = numbers[-1].to_bytes(block_size, "big")[0]
+        data += numbers[-1].to_bytes(block_size, "big")[padding:]
     # And this is when we have a multiple of 128 bytes, so no padding
     else:
         if len(numbers) > 1:
-            data += numbers[-2].to_bytes(block_size)
+            data += numbers[-2].to_bytes(block_size, "big")
     return data
 
 
