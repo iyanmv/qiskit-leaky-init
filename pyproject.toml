@@ -1,12 +1,12 @@
 [project]
 name = "qiskit-leaky-init"
-version = "0.2.2"
+version = "0.2.3"
 description = "A transpilation plugin for Qiskit with a modified init stage that encodes (classical) information adding RZGates to auxiliary qubits"
 authors = [
     {name = "Iyán Méndez Veiga", email = "me@iyanmv.com"},
 ]
 dependencies = [
-    "qiskit>=1.0,<2.3",
+    "qiskit>=1.0,<2.4",
     "qiskit-ibm-runtime>=0.25.0",
 ]
 requires-python = ">=3.10"
